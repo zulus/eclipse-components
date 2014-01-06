@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Eclipse Utils
+Bundle-SymbolicName: si.gos.eclipseutils
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: gossi
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: si.gos.eclipseutils.dialogs
