@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="si.gos.eclipse.example.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            name="Perspective"
+            class="si.gos.eclipse.example.ui.Perspective"
+            id="si.gos.eclipse.example.perspective">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            name="View"
+            class="si.gos.eclipse.example.ui.View"
+            id="si.gos.eclipse.example.view">
+      </view>
+      <view
+            class="si.gos.eclipse.example.editor.EditorView"
+            id="si.gos.eclipse.example.editor.view"
+            name="Editor View"
+            restorable="true">
+      </view>
+   </extension>
+   <!--<extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="si.gos.eclipse.example.perspective">
+         <view
+               id="si.gos.eclipse.example.view"
+               minimized="false"
+               ratio="0.3"
+               relationship="left">
+         </view>
+         <view
+               id="si.gos.eclipse.example.editor.view"
+               minimized="false"
+               ratio="0.7"
+               relationship="right">
+         </view>
+      </perspectiveExtension>
+   </extension>-->
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu">
+         <menu
+               label="File">
+            <command
+                  commandId="org.eclipse.ui.file.exit"
+                  label="Exit">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+
+</plugin>
