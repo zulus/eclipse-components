@@ -16,6 +16,7 @@ package si.gos.eclipse.parts;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 
 import si.gos.eclipse.widgets.helper.IWidgetFactory;
 
@@ -30,6 +31,8 @@ public abstract class SharedPart {
 	}
 
 	public abstract void createControl(Composite parent, int style, int span, IWidgetFactory factory);
+	
+	protected abstract Shell getShell();
 
 	public boolean isEnabled() {
 		return enabled;

@@ -9,5 +9,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  org.eclipse.ui.forms
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: si.gos.eclipse.dialogs
+Export-Package: si.gos.eclipse.dialogs,
+ si.gos.eclipse.editor,
+ si.gos.eclipse.forms,
+ si.gos.eclipse.parts,
+ si.gos.eclipse.widgets.helper
 Import-Package: org.eclipse.ui.forms.widgets

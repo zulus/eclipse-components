@@ -69,6 +69,10 @@ public abstract class StructuredViewerPart extends ActionPart {
 			fSensitiveButtons.add(sensitiveButtons[i]);
 		}
 	}
+	
+	protected void setSensitiveButtons(List<Integer> sensitiveButtons) {
+		fSensitiveButtons = sensitiveButtons;
+	}
 
 	public StructuredViewer getViewer() {
 		return fViewer;

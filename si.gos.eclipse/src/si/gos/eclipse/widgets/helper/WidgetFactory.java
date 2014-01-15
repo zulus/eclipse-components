@@ -22,7 +22,7 @@ public class WidgetFactory extends AbstractWidgetFactory {
 	// ---- Button
 	
 	public Button createButton(Composite parent, String text, int style) {
-		Button btn = createButton(parent, style);
+		Button btn = new Button(parent, style);
 		btn.setText(text);
 		return btn;
 	}
@@ -30,7 +30,7 @@ public class WidgetFactory extends AbstractWidgetFactory {
 	// ---- Label
 	
 	public Label createLabel(Composite parent, String text, int style) {
-		Label lbl = createLabel(parent, style);
+		Label lbl = new Label(parent, style);
 		lbl.setText(text);
 		return lbl;
 	}
@@ -57,7 +57,7 @@ public class WidgetFactory extends AbstractWidgetFactory {
 	// ---- Text
 	
 	public Text createText(Composite parent, String text, int style) {
-		Text txt = createText(parent, style);
+		Text txt = new Text(parent, style);
 		txt.setText(text);
 		return txt;
 	}
@@ -77,7 +77,7 @@ public class WidgetFactory extends AbstractWidgetFactory {
 	// ---- Hyperlink
 	
 	public Hyperlink createHyperlink(Composite parent, String text, int style) {
-		Hyperlink link = createHyperlink(parent, style);
+		Hyperlink link = new Hyperlink(parent, style);
 		link.setText(text);
 		return link;
 	}

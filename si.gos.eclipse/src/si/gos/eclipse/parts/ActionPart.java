@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 
 import si.gos.eclipse.widgets.helper.IWidgetFactory;
 
@@ -37,6 +38,7 @@ public abstract class ActionPart extends SharedPart {
 	private Button[] fButtons;
 	private boolean[] fButtonEnabledStates;
 	protected Composite fButtonContainer;
+	private Shell shell;
 
 	private class SelectionHandler implements SelectionListener {
 		public void widgetSelected(SelectionEvent e) {
@@ -54,6 +56,10 @@ public abstract class ActionPart extends SharedPart {
 	}
 
 	public ActionPart(String[] buttonLabels) {
+		setButtonLabels(buttonLabels);
+	}
+	
+	protected void setButtonLabels(String[] buttonLabels) {
 		fButtonLabels = buttonLabels;
 	}
 
@@ -83,14 +89,19 @@ public abstract class ActionPart extends SharedPart {
 	 * @see SharedPart#createControl(Composite, FormWidgetFactory)
 	 */
 	public void createControl(Composite parent, int style, int span, IWidgetFactory factory) {
+		shell = parent.getShell();
 		createMainLabel(parent, span, factory);
 		createMainControl(parent, style, span - 1, factory);
 		createButtons(parent, factory);
 	}
+	
+	protected Shell getShell() {
+		return shell;
+	}
 
 	protected void createButtons(Composite parent, IWidgetFactory factory) {
 		if (fButtonLabels != null && fButtonLabels.length > 0) {
-			fButtonContainer = createComposite(parent, factory);
+			fButtonContainer = factory.createComposite(parent);
 			GridData gd = new GridData(GridData.FILL_VERTICAL);
 			fButtonContainer.setLayoutData(gd);
 			fButtonContainer.setLayout(createButtonsLayout());
@@ -112,6 +123,9 @@ public abstract class ActionPart extends SharedPart {
 	protected GridLayout createButtonsLayout() {
 		GridLayout layout = new GridLayout();
 		layout.marginWidth = layout.marginHeight = 0;
+		layout.marginTop = layout.marginBottom = 0;
+		layout.marginLeft = layout.marginRight = 0;
+		layout.verticalSpacing = layout.horizontalSpacing = 0;
 		return layout;
 	}
 

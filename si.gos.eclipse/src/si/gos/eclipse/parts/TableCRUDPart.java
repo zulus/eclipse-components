@@ -8,6 +8,14 @@ import si.gos.eclipse.widgets.helper.IWidgetFactory;
 
 public class TableCRUDPart extends CRUDPart {
 
+	public TableCRUDPart() {
+		super();
+	}
+	
+	public TableCRUDPart(boolean add, boolean edit, boolean remove) {
+		super(add, edit, remove);
+	}
+	
 	/*
 	 * @see StructuredViewerPart#createStructuredViewer(Composite, IWidgetFactory)
 	 */
