@@ -56,5 +56,4 @@ public class TablePart extends StructuredViewerPart {
 			count.setText("Total: " + Integer.toString(getTableViewer().getTable().getItemCount()));
 		}
 	}
-
 }

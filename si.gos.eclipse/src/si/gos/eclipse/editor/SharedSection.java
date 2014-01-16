@@ -26,11 +26,17 @@ public abstract class SharedSection extends SectionPart {
 	}
 	
 	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
+		if (enabled != this.enabled) {
+			this.enabled = enabled;
+			updateEnabledState();
+		}
 	}
 	
 	public boolean isEnabled() {
 		return enabled;
+	}
+	
+	protected void updateEnabledState() {
 	}
 	
 	protected abstract void createClient(Section section, FormToolkit toolkit);

@@ -17,6 +17,8 @@ package si.gos.eclipse.parts;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -26,6 +28,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
+import si.gos.eclipse.actions.PartAction;
 import si.gos.eclipse.widgets.helper.IWidgetFactory;
 
 /**
@@ -34,12 +37,16 @@ import si.gos.eclipse.widgets.helper.IWidgetFactory;
  * 
  */
 public abstract class ActionPart extends SharedPart {
-	private String[] fButtonLabels;
-	private Button[] fButtons;
-	private boolean[] fButtonEnabledStates;
-	protected Composite fButtonContainer;
+	
+	public final static String ACTION_KEY = "action";
+	
+	private PartAction[] actions;
+	private boolean[] enabledStates;
+	
+	private Button[] buttons;
+	protected Composite buttonContainer;
 	private Shell shell;
-
+	
 	private class SelectionHandler implements SelectionListener {
 		public void widgetSelected(SelectionEvent e) {
 			buttonSelected(e);
@@ -50,44 +57,63 @@ public abstract class ActionPart extends SharedPart {
 		}
 
 		private void buttonSelected(SelectionEvent e) {
-			Integer index = (Integer) e.widget.getData();
-			ActionPart.this.buttonSelected((Button) e.widget, index.intValue());
+			Object action = e.widget.getData(ACTION_KEY);
+			if (action instanceof PartAction) {
+				((PartAction)action).run();
+			}
 		}
 	}
 
-	public ActionPart(String[] buttonLabels) {
-		setButtonLabels(buttonLabels);
+	public ActionPart(String[] actionLabels) {
+		createActions(actionLabels);
+	}
+
+	private void createActions(String[] actionLabels) {
+		actions = new PartAction[actionLabels.length];
+		
+		for (int i = 0; i < actionLabels.length; i++) {
+			final int index = i;
+			String label = actionLabels[i];
+			actions[i] = createAction(label, index);
+		}
+	}
+
+	protected PartAction createAction(String label, final int index) {
+		return new PartAction(label) {
+			public void run() {
+				handleAction(this, index);
+			}
+		};
 	}
 	
-	protected void setButtonLabels(String[] buttonLabels) {
-		fButtonLabels = buttonLabels;
-	}
+	public PartAction getAction(int index) {
+		if ((actions == null) || (index < 0) || (index >= actions.length)) {
+			return null;
+		}
 
-	public void setButtonEnabled(int index, boolean enabled) {
-		if (fButtons != null && index >= 0 && fButtons.length > index) {
-			fButtons[index].setEnabled(enabled);
+		return actions[index];
+	}
+	
+	public PartAction[] getActions() {
+		return actions;
+	}
+	
+	public void setActionEnabled(int index, boolean enabled) {
+		if (actions != null && index >= 0 && actions.length > index) {
+			actions[index].setEnabled(enabled);
 		}
 	}
-
-	/**
-	 * Set the specified button's visibility.
-	 * Fix for defect 190717.
-	 * @param index The index of the button to be changed
-	 * @param visible true if the button is to be shown, false if hidden
-	 */
-	public void setButtonVisible(int index, boolean visible) {
-		if (fButtons != null && index >= 0 && fButtons.length > index) {
-			fButtons[index].setVisible(visible);
+	
+	public void setActionVisible(int index, boolean visible) {
+		if (actions != null && index >= 0 && actions.length > index) {
+			actions[index].setVisible(visible);
 		}
 	}
 
 	protected abstract void createMainControl(Composite parent, int style, int span, IWidgetFactory factory);
 
-	protected abstract void buttonSelected(Button button, int index);
+	protected abstract void handleAction(PartAction action, int index);
 
-	/*
-	 * @see SharedPart#createControl(Composite, FormWidgetFactory)
-	 */
 	public void createControl(Composite parent, int style, int span, IWidgetFactory factory) {
 		shell = parent.getShell();
 		createMainLabel(parent, span, factory);
@@ -100,21 +126,21 @@ public abstract class ActionPart extends SharedPart {
 	}
 
 	protected void createButtons(Composite parent, IWidgetFactory factory) {
-		if (fButtonLabels != null && fButtonLabels.length > 0) {
-			fButtonContainer = factory.createComposite(parent);
+		if (actions != null && actions.length > 0) {
+			buttonContainer = factory.createComposite(parent);
 			GridData gd = new GridData(GridData.FILL_VERTICAL);
-			fButtonContainer.setLayoutData(gd);
-			fButtonContainer.setLayout(createButtonsLayout());
-			fButtons = new Button[fButtonLabels.length];
+			buttonContainer.setLayoutData(gd);
+			buttonContainer.setLayout(createButtonsLayout());
+			buttons = new Button[actions.length];
 			SelectionHandler listener = new SelectionHandler();
-			for (int i = 0; i < fButtonLabels.length; i++) {
-				String label = fButtonLabels[i];
+			for (int i = 0; i < actions.length; i++) {
+				String label = actions[i].getText();
 				if (label != null) {
-					Button button = createButton(fButtonContainer, label, i, factory);
+					Button button = createButton(buttonContainer, label, i, factory);
 					button.addSelectionListener(listener);
-					fButtons[i] = button;
+					buttons[i] = button;
 				} else {
-					createEmptySpace(fButtonContainer, 1, factory);
+					createEmptySpace(buttonContainer, 1, factory);
 				}
 			}
 		}
@@ -130,11 +156,33 @@ public abstract class ActionPart extends SharedPart {
 	}
 
 	protected Button createButton(Composite parent, String label, int index, IWidgetFactory factory) {
-		Button button = factory.createButton(parent, label, SWT.PUSH);
+		final Button button = factory.createButton(parent, label, SWT.PUSH);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING);
 		button.setLayoutData(gd);
 		button.setData(new Integer(index));
 
+		// add property change listener
+		PartAction action = getAction(index);
+		action.addPropertyChangeListener(new IPropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent event) {
+				String prop = event.getProperty();
+				
+				if (prop.equals("enabled")) {
+					button.setEnabled((Boolean)event.getNewValue());
+				}
+				
+				else if (prop.equals("visible")) {
+					button.setVisible((Boolean)event.getNewValue());
+					button.getParent().layout(true, true);
+				}
+				
+				else if (prop.equals("text")) {
+					button.setText((String)event.getNewValue());
+				}
+			}
+		});
+		button.setData(ACTION_KEY, action);
+		
 		// Set the default button size
 		button.setFont(JFaceResources.getDialogFont());
 		PixelConverter converter = new PixelConverter(button);
@@ -145,28 +193,42 @@ public abstract class ActionPart extends SharedPart {
 	}
 
 	protected void updateEnabledState() {
-		for (int i = 0; i < fButtons.length; i++) {
+		if (enabledStates == null) {
+			enabledStates = new boolean[actions.length];
+		}
+
+		for (int i = 0; i < actions.length; i++) {
 			// activate
 			if (isEnabled()) {
-				fButtons[i].setEnabled(fButtonEnabledStates[i]);
+				actions[i].setEnabled(enabledStates[i]);
 			} 
 			
 			// deatcivate
 			else {
-				fButtonEnabledStates[i] = fButtons[i].getEnabled(); 
+				enabledStates[i] = actions[i] != null ? actions[i].isEnabled() : true;
 			}
 		}
+	}
+	
+	@Override
+	protected void updateGrayedState() {
+		for (int i = 0; i < buttons.length; i++) {
+			buttons[i].setGrayed(isGrayed());
+		}
+		
+		super.updateGrayedState();
 	}
 
 	protected void createMainLabel(Composite parent, int span, IWidgetFactory factory) {
 	}
 
 	public Button getButton(int index) {
-		//
-		if ((fButtons == null) || (index < 0) || (index >= fButtons.length)) {
+		if ((buttons == null) || (index < 0) || (index >= buttons.length)) {
 			return null;
 		}
-		//
-		return fButtons[index];
+
+		return buttons[index];
 	}
+
+	
 }

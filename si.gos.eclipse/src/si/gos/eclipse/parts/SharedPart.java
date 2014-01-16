@@ -21,18 +21,24 @@ import org.eclipse.swt.widgets.Shell;
 import si.gos.eclipse.widgets.helper.IWidgetFactory;
 
 public abstract class SharedPart {
+	
+	public final static boolean DEFAULT_GRAY_ON_DISABLED = true;
+	
 	private boolean enabled = true;
+	private boolean grayed = false;
+	
+	private boolean grayOnDisabled = DEFAULT_GRAY_ON_DISABLED;
 
 	public void setEnabled(boolean enabled) {
 		if (enabled != this.enabled) {
 			this.enabled = enabled;
 			updateEnabledState();
+			
+			if (grayOnDisabled) {
+				setGrayed(enabled);
+			}
 		}
 	}
-
-	public abstract void createControl(Composite parent, int style, int span, IWidgetFactory factory);
-	
-	protected abstract Shell getShell();
 
 	public boolean isEnabled() {
 		return enabled;
@@ -40,6 +46,42 @@ public abstract class SharedPart {
 
 	protected void updateEnabledState() {
 	}
+	
+	/**
+	 * @return the grayed
+	 */
+	public boolean isGrayed() {
+		return grayed;
+	}
+
+	/**
+	 * @param grayed the grayed to set
+	 */
+	public void setGrayed(boolean grayed) {
+		this.grayed = grayed;
+		updateGrayedState();
+	}
+	
+	protected void updateGrayedState() {
+	}
+	
+	/**
+	 * @return the grayOnDisabled
+	 */
+	public boolean getGrayOnDisabled() {
+		return grayOnDisabled;
+	}
+
+	/**
+	 * @param grayOnDisabled the grayOnDisabled to set
+	 */
+	public void setGrayOnDisabled(boolean grayOnDisabled) {
+		this.grayOnDisabled = grayOnDisabled;
+	}
+
+	public abstract void createControl(Composite parent, int style, int span, IWidgetFactory factory);
+	
+	protected abstract Shell getShell();
 
 	protected Composite createComposite(Composite parent, IWidgetFactory factory) {
 		return factory.createComposite(parent);
@@ -54,5 +96,6 @@ public abstract class SharedPart {
 		label.setLayoutData(gd);
 		return label;
 	}
+	
 }
 

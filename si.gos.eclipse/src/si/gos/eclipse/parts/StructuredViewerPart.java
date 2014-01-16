@@ -36,98 +36,118 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.forms.IFormColors;
 
+import si.gos.eclipse.actions.PartAction;
 import si.gos.eclipse.widgets.helper.IWidgetFactory;
 import si.gos.eclipse.widgets.helper.ToolkitFactory;
 
 public abstract class StructuredViewerPart extends ActionPart {
 
-	private StructuredViewer fViewer;
-
-	private Point fMinSize;
+	public final static boolean DEFAULT_CREATE_COUNT = false;
+	public final static boolean DEFAULT_CREATE_CONTEXT_MENU = true;
 	
-	private List<Integer> fSensitiveButtons = new ArrayList<Integer>();
+	private StructuredViewer viewer;
+
+	private Point minSize;
+	
+	private List<Integer> sensitiveActions = new ArrayList<Integer>();
 	
 	protected Label count;
 	
-	private MenuManager popupMenuManager;
+	private MenuManager contextMenuManager;
+	
+	private List<ISelectionChangedListener> selectionChangedListener = new ArrayList<ISelectionChangedListener>();
 
-	public StructuredViewerPart(String[] buttonLabels) {
-		super(buttonLabels);
+	public StructuredViewerPart(String[] actionLabels) {
+		super(actionLabels);
 	}
 	
 	/**
-	 * Creates are StructuredViewerPart with sensitive buttons. Sensitive buttons will 
+	 * Creates are StructuredViewerPart with sensitive buttons. Sensitive actions will 
 	 * be enabled once a selection is made in the viewer. 
-	 *  
-	 * @param buttonLabels
-	 * @param sensitiveButtons indices of sensitive buttons
+	 * 
+	 * @param actionLabels
+	 * @param sensitiveActions indices of sensitive actions
 	 */
-	public StructuredViewerPart(String[] buttonLabels, int[] sensitiveButtons) {
-		super(buttonLabels);
+	public StructuredViewerPart(String[] actionLabels, int[] sensitiveActions) {
+		super(actionLabels);
 
-		for (int i = 0; i < sensitiveButtons.length; i++) {
-			fSensitiveButtons.add(sensitiveButtons[i]);
+		for (int i = 0; i < sensitiveActions.length; i++) {
+			this.sensitiveActions.add(sensitiveActions[i]);
 		}
-	}
-	
-	protected void setSensitiveButtons(List<Integer> sensitiveButtons) {
-		fSensitiveButtons = sensitiveButtons;
 	}
 
 	public StructuredViewer getViewer() {
-		return fViewer;
+		return viewer;
 	}
 
 	public Control getControl() {
-		return fViewer.getControl();
+		return viewer.getControl();
+	}
+	
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		if (!selectionChangedListener.contains(listener)) {
+			selectionChangedListener.add(listener);
+		}
+	}
+	
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		selectionChangedListener.remove(listener);
 	}
 
 	protected void createMainControl(Composite parent, int style, int span, IWidgetFactory factory) {
-		fViewer = createStructuredViewer(parent, style, factory);
+		viewer = createStructuredViewer(parent, style, factory);
 		
 		// add listeners
-		fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent e) {
 				StructuredViewerPart.this.selectionChanged((IStructuredSelection) e.getSelection());
 				
-				for (int index : fSensitiveButtons) {
+				for (int index : sensitiveActions) {
 					getButton(index).setEnabled(!e.getSelection().isEmpty() && isEnabled());
+				}
+				
+				for (ISelectionChangedListener listener : selectionChangedListener) {
+					listener.selectionChanged(e);
 				}
 			}
 		});
-		fViewer.addDoubleClickListener(new IDoubleClickListener() {
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent e) {
 				StructuredViewerPart.this.handleDoubleClick((IStructuredSelection) e.getSelection());
 			}
 		});
 		
 		// layout
-		Control control = fViewer.getControl();
+		Control control = viewer.getControl();
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = span;
 		control.setLayoutData(gd);
 		applyMinimumSize();
 		
 		// context menu
-		popupMenuManager = new MenuManager();
-		IMenuListener listener = new IMenuListener() {
-			public void menuAboutToShow(IMenuManager mng) {
-				fillContextMenu(mng);
-			}
-		};
-		popupMenuManager.addMenuListener(listener);
-		popupMenuManager.setRemoveAllWhenShown(true);
-		Menu menu = popupMenuManager.createContextMenu(control);
-		control.setMenu(menu);
-		registerPopupMenu(popupMenuManager);
+		if (createContextMenu()) {
+			contextMenuManager = new MenuManager();
+			IMenuListener listener = new IMenuListener() {
+				public void menuAboutToShow(IMenuManager mng) {
+					fillContextMenu(mng);
+				}
+			};
+			contextMenuManager.addMenuListener(listener);
+			contextMenuManager.setRemoveAllWhenShown(true);
+			Menu menu = contextMenuManager.createContextMenu(control);
+			control.setMenu(menu);
+			registerContextMenu(contextMenuManager);
+		}
 	}
 	
+	protected abstract StructuredViewer createStructuredViewer(Composite parent, int style, IWidgetFactory factory);
+
 	@Override
 	protected void createButtons(Composite parent, IWidgetFactory factory) {
 		super.createButtons(parent, factory);
 		
 		if (createCount()) {
-			Composite comp = factory.createComposite(fButtonContainer);
+			Composite comp = factory.createComposite(buttonContainer);
 			comp.setLayout(createButtonsLayout());
 			comp.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_END | GridData.FILL_BOTH));
 			count = factory.createLabel(comp);
@@ -145,69 +165,77 @@ public abstract class StructuredViewerPart extends ActionPart {
 	}
 	
 	@Override
-	protected Button createButton(Composite parent, String label, int index,
-			IWidgetFactory factory) {
+	protected Button createButton(Composite parent, String label, int index, IWidgetFactory factory) {
 		Button button = super.createButton(parent, label, index, factory);
-		if (fSensitiveButtons.contains(index)) {
+		if (sensitiveActions.contains(index)) {
 			button.setEnabled(false);
 		}
 		return button;
 	}
 	
-	
-	protected abstract void updateLabel();
-	
-	
-	protected boolean createCount() {
-		return false;
-	}
-
-	public void setMinimumSize(int width, int height) {
-		fMinSize = new Point(width, height);
-		if (fViewer != null)
-			applyMinimumSize();
-	}
-
-	private void applyMinimumSize() {
-		if (fMinSize != null) {
-			GridData gd = (GridData) fViewer.getControl().getLayoutData();
-			gd.widthHint = fMinSize.x;
-			gd.heightHint = fMinSize.y;
+	protected void selectionChanged(IStructuredSelection selection) {
+		// enabled/disable sensitive actions
+		for (int index : sensitiveActions) {
+			getAction(index).setEnabled(!selection.isEmpty());
 		}
 	}
 	
+	protected abstract void updateLabel();
+	
+	protected boolean createCount() {
+		return DEFAULT_CREATE_COUNT;
+	}
+	
+	protected boolean createContextMenu() {
+		return DEFAULT_CREATE_CONTEXT_MENU;
+	}
+
+	public void setMinimumSize(int width, int height) {
+		minSize = new Point(width, height);
+		
+		if (viewer != null) {
+			applyMinimumSize();
+		}
+	}
+
+	private void applyMinimumSize() {
+		if (minSize != null) {
+			GridData gd = (GridData) viewer.getControl().getLayoutData();
+			gd.widthHint = minSize.x;
+			gd.heightHint = minSize.y;
+		}
+	}
+
 	/**
-	 * If the context menu for this section should be registered, do it here
-	 * with the appropriate id etc.  By default do nothing.
-	 * @param popupMenuManager the menu manager to be registered
+	 * If the context menu for this part should be registered, do it here
+	 * with the appropriate id etc. By default do nothing.
+	 * 
+	 * @param contextMenuManager the menu manager to be registered
 	 */
-	protected void registerPopupMenu(MenuManager popupMenuManager) {
+	protected void registerContextMenu(IMenuManager contextMenuManager) {
 		// do nothing by default
 	}
 	
 	protected void fillContextMenu(IMenuManager manager) {
+		for (PartAction action : getActions()) {
+			if (action.isVisible()) {
+				manager.add(action);
+			}
+		}
 	}
 	
-	protected MenuManager getMenuManager() {
-		return popupMenuManager;
+	protected IMenuManager getContextMenu() {
+		return contextMenuManager;
 	}
 
 	protected void updateEnabledState() {
 		getControl().setEnabled(isEnabled());
 		super.updateEnabledState();
 	}
-	
-	/*
-	 * @see SharedPartWithButtons#buttonSelected(int)
-	 */
-	protected void buttonSelected(Button button, int index) {
-	}
 
-	protected void selectionChanged(IStructuredSelection selection) {
+	protected void handleAction(PartAction action, int index) {
 	}
 
 	protected void handleDoubleClick(IStructuredSelection selection) {
 	}
-
-	protected abstract StructuredViewer createStructuredViewer(Composite parent, int style, IWidgetFactory factory);
 }

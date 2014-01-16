@@ -14,26 +14,24 @@
 package si.gos.eclipse.editor;
 
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import si.gos.eclipse.actions.PartAction;
 import si.gos.eclipse.parts.StructuredViewerPart;
 import si.gos.eclipse.parts.TablePart;
 import si.gos.eclipse.widgets.helper.ToolkitFactory;
 
 public abstract class TableSection extends StructuredViewerSection {
-	protected boolean handleDefaultButton = true;
 
 	class PartAdapter extends TablePart implements IStructuredViewerAdapter {
-		public PartAdapter(String[] buttonLabels) {
-			super(buttonLabels);
+		public PartAdapter(String[] actionLabels) {
+			super(actionLabels);
 		}
 		
-		public PartAdapter(String[] buttonLabels, int[] sensitiveButtons) {
-			super(buttonLabels, sensitiveButtons);
+		public PartAdapter(String[] actionLabels, int[] sensitiveActions) {
+			super(actionLabels, sensitiveActions);
 		}
 
 		public void selectionChanged(IStructuredSelection selection) {
@@ -47,11 +45,13 @@ public abstract class TableSection extends StructuredViewerSection {
 			TableSection.this.handleDoubleClick(selection);
 		}
 
-		public void buttonSelected(Button button, int index) {
-			super.buttonSelected(button, index);
-			TableSection.this.buttonSelected(index);
-			if (handleDefaultButton)
-				button.getShell().setDefaultButton(null);
+		public void handleAction(PartAction action, int index) {
+			super.handleAction(action, index);
+			TableSection.this.handleAction(index);
+		}
+		
+		protected void createButtons(Composite parent, FormToolkit toolkit) {
+			super.createButtons(parent, new ToolkitFactory(toolkit));
 		}
 		
 		public void fillContextMenu(IMenuManager manager) {
@@ -59,57 +59,35 @@ public abstract class TableSection extends StructuredViewerSection {
 			TableSection.this.fillContextMenu(manager);
 		}
 		
-		public void registerPopupMenu(MenuManager popupMenuManager) {
-			super.registerPopupMenu(popupMenuManager);
-			TableSection.this.registerPopupMenu(popupMenuManager);
+		public void registerContextMenu(IMenuManager contextMenuManager) {
+			super.registerContextMenu(contextMenuManager);
+			TableSection.this.registerContextMenu(contextMenuManager);
 		}
 		
 		public boolean createCount() {
 			return TableSection.this.createCount();
 		}
-
-		protected void createButtons(Composite parent, FormToolkit toolkit) {
-			super.createButtons(parent, new ToolkitFactory(toolkit));
-			enableButtons();
+		
+		public boolean createContextMenu() {
+			return TableSection.this.createContextMenu();
 		}
+
 	}
 	
-	/**
-	 * Constructor for TableSection.
-	 * 
-	 * @param formPage
-	 */
-	public TableSection(SharedFormPage formPage, Composite parent, int style, String[] buttonLabels) {
-		this(formPage, parent, style, true, buttonLabels);
+	public TableSection(SharedFormPage formPage, Composite parent, int style, String[] actionLabels) {
+		this(formPage, parent, style, true, actionLabels);
 	}
 
-	/**
-	 * Constructor for TableSection.
-	 * 
-	 * @param formPage
-	 */
 	public TableSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, String[] buttonLabels) {
 		super(formPage, parent, style, titleBar, buttonLabels, new int[]{});
 	}
 
-	protected StructuredViewerPart createViewerPart(String[] buttonLabels, int[] senstiveButtons) {
-		return new PartAdapter(buttonLabels, senstiveButtons);
+	protected StructuredViewerPart createViewerPart(String[] actionLabels, int[] senstiveActions) {
+		return new PartAdapter(actionLabels, senstiveActions);
 	}
 
 	protected TablePart getTablePart() {
 		return (TablePart) viewerPart;
 	}
-
-	protected void selectionChanged(IStructuredSelection selection) {
-	}
-
-	protected void handleDoubleClick(IStructuredSelection selection) {
-	}
-
-	protected void enableButtons() {
-	}
-
-	protected boolean createCount() {
-		return false;
-	}
+	
 }

@@ -13,30 +13,26 @@
  *******************************************************************************/
 package si.gos.eclipse.editor;
 
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import si.gos.eclipse.actions.PartAction;
 import si.gos.eclipse.parts.StructuredViewerPart;
 import si.gos.eclipse.parts.TreePart;
 import si.gos.eclipse.widgets.helper.ToolkitFactory;
 
 
 public abstract class TreeSection extends StructuredViewerSection {
-	protected boolean handleDefaultButton = true;
 
-	class PartAdapter extends TreePart {
-		public PartAdapter(String[] buttonLabels) {
-			super(buttonLabels);
+	class PartAdapter extends TreePart implements IStructuredViewerAdapter {
+		public PartAdapter(String[] actionLabels) {
+			super(actionLabels);
 		}
 		
-		public PartAdapter(String[] buttonLabels, int[] sensitiveButtons) {
-			super(buttonLabels, sensitiveButtons);
-		}
-
-		public void entryModified(Object entry, String value) {
-			TreeSection.this.entryModified(entry, value);
+		public PartAdapter(String[] actionLabels, int[] sensitiveActions) {
+			super(actionLabels, sensitiveActions);
 		}
 
 		public void selectionChanged(IStructuredSelection selection) {
@@ -47,33 +43,40 @@ public abstract class TreeSection extends StructuredViewerSection {
 		public void handleDoubleClick(IStructuredSelection selection) {
 			TreeSection.this.handleDoubleClick(selection);
 		}
-
-		public void buttonSelected(Button button, int index) {
-			TreeSection.this.buttonSelected(index);
-			if (handleDefaultButton)
-				button.getShell().setDefaultButton(null);
+		
+		public void handleAction(PartAction action, int index) {
+			super.handleAction(action, index);
+			TreeSection.this.handleAction(index);
 		}
-
+		
 		protected void createButtons(Composite parent, FormToolkit toolkit) {
 			super.createButtons(parent, new ToolkitFactory(toolkit));
-			enableButtons();
 		}
+
+		public void fillContextMenu(IMenuManager manager) {
+			super.fillContextMenu(manager);
+			TreeSection.this.fillContextMenu(manager);
+		}
+		
+		public void registerContextMenu(IMenuManager contextMenuManager) {
+			super.registerContextMenu(contextMenuManager);
+			TreeSection.this.registerContextMenu(contextMenuManager);
+		}
+		
+		public boolean createCount() {
+			return TreeSection.this.createCount();
+		}
+		
+		public boolean createContextMenu() {
+			return TreeSection.this.createContextMenu();
+		}
+
 	}
-	
-	/**
-	 * Constructor for TableSection.
-	 * 
-	 * @param formPage
-	 */
+
 	public TreeSection(SharedFormPage formPage, Composite parent, int style, String[] buttonLabels) {
 		this(formPage, parent, style, true, buttonLabels);
 	}
 
-	/**
-	 * Constructor for TableSection.
-	 * 
-	 * @param formPage
-	 */
 	public TreeSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, String[] buttonLabels) {
 		super(formPage, parent, style, titleBar, buttonLabels, new int[]{});
 	}
@@ -85,20 +88,5 @@ public abstract class TreeSection extends StructuredViewerSection {
 	protected TreePart getTreePart() {
 		return (TreePart) viewerPart;
 	}
-
-	protected void entryModified(Object entry, String value) {
-	}
-
-	protected void selectionChanged(IStructuredSelection selection) {
-	}
-
-	protected void handleDoubleClick(IStructuredSelection selection) {
-	}
-
-	protected void enableButtons() {
-	}
-
-	protected boolean createCount() {
-		return false;
-	}
+	
 }

@@ -13,89 +13,88 @@
  *******************************************************************************/
 package si.gos.eclipse.editor;
 
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import si.gos.eclipse.actions.PartAction;
 import si.gos.eclipse.parts.StructuredViewerPart;
-import si.gos.eclipse.parts.TreeCRUDPart;
+import si.gos.eclipse.parts.TableCRUDPart;
 import si.gos.eclipse.parts.TreePart;
 import si.gos.eclipse.widgets.helper.ToolkitFactory;
 
 
-public abstract class TreeCRUDSection extends StructuredViewerSection {
-	protected boolean handleDefaultButton = true;
-
-	class PartAdapter extends TreeCRUDPart {
+public abstract class TreeCRUDSection extends CRUDSection {
+	
+	class PartAdapter extends TableCRUDPart implements ICRUDPartAdapter {
 		public PartAdapter() {
 			super();
 		}
 
-		public void entryModified(Object entry, String value) {
-			TreeCRUDSection.this.entryModified(entry, value);
-		}
-
 		public void selectionChanged(IStructuredSelection selection) {
+			super.selectionChanged(selection);
 			getManagedForm().fireSelectionChanged(TreeCRUDSection.this, selection);
 			TreeCRUDSection.this.selectionChanged(selection);
 		}
 
 		public void handleDoubleClick(IStructuredSelection selection) {
+			super.handleDoubleClick(selection);
 			TreeCRUDSection.this.handleDoubleClick(selection);
 		}
 
-		public void buttonSelected(Button button, int index) {
-			TreeCRUDSection.this.buttonSelected(index);
-			if (handleDefaultButton)
-				button.getShell().setDefaultButton(null);
+		public void handleAction(PartAction action, int index) {
+			super.handleAction(action, index);
+			TreeCRUDSection.this.handleAction(index);
 		}
-
+		
 		protected void createButtons(Composite parent, FormToolkit toolkit) {
 			super.createButtons(parent, new ToolkitFactory(toolkit));
-			enableButtons();
+		}
+		
+		public void fillContextMenu(IMenuManager manager) {
+			super.fillContextMenu(manager);
+			TreeCRUDSection.this.fillContextMenu(manager);
+		}
+		
+		public void registerContextMenu(IMenuManager contextMenuManager) {
+			super.registerContextMenu(contextMenuManager);
+			TreeCRUDSection.this.registerContextMenu(contextMenuManager);
+		}
+		
+		public boolean createCount() {
+			return TreeCRUDSection.this.createCount();
+		}
+		
+		public boolean createContextMenu() {
+			return TreeCRUDSection.this.createContextMenu();
+		}
+		
+		public void handleAdd(IStructuredSelection selection) {
+			super.handleAdd(selection);
+			TreeCRUDSection.this.handleAdd(selection);
+		}
+
+		public void handleEdit(IStructuredSelection selection) {
+			super.handleEdit(selection);
+			TreeCRUDSection.this.handleEdit(selection);
+		}
+
+		public void handleRemove(IStructuredSelection selection) {
+			super.handleRemove(selection);
+			TreeCRUDSection.this.handleRemove(selection);
 		}
 	}
 	
-	/**
-	 * Constructor for TableSection.
-	 * 
-	 * @param formPage
-	 */
-	public TreeCRUDSection(SharedFormPage formPage, Composite parent, int style, String[] buttonLabels) {
-		this(formPage, parent, style, true, buttonLabels);
+	public TreeCRUDSection(SharedFormPage formPage, Composite parent, int style) {
+		super(formPage, parent, style, true);
 	}
 
-	/**
-	 * Constructor for TableSection.
-	 * 
-	 * @param formPage
-	 */
-	public TreeCRUDSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, String[] buttonLabels) {
-		super(formPage, parent, style, titleBar, buttonLabels, new int[]{});
-	}
-
-	protected StructuredViewerPart createViewerPart(String[] buttonLabels, int[] senstiveButtons) {
+	protected StructuredViewerPart createViewerPart(String[] actionLabels, int[] senstiveActions) {
 		return new PartAdapter();
 	}
 
 	protected TreePart getTreePart() {
 		return (TreePart) viewerPart;
-	}
-
-	protected void entryModified(Object entry, String value) {
-	}
-
-	protected void selectionChanged(IStructuredSelection selection) {
-	}
-
-	protected void handleDoubleClick(IStructuredSelection selection) {
-	}
-
-	protected void enableButtons() {
-	}
-
-	protected boolean createCount() {
-		return false;
 	}
 }
