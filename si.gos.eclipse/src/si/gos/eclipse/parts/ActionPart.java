@@ -105,6 +105,7 @@ public abstract class ActionPart extends SharedPart {
 	}
 	
 	public void setActionVisible(int index, boolean visible) {
+		System.out.println("Set Action visible, index: " + index + ", visible: " + visible);
 		if (actions != null && index >= 0 && actions.length > index) {
 			actions[index].setVisible(visible);
 		}
@@ -156,10 +157,14 @@ public abstract class ActionPart extends SharedPart {
 	}
 
 	protected Button createButton(Composite parent, String label, int index, IWidgetFactory factory) {
+		
+		boolean visible = getAction(index).isVisible();
 		final Button button = factory.createButton(parent, label, SWT.PUSH);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING);
+		gd.exclude = !visible;
 		button.setLayoutData(gd);
 		button.setData(new Integer(index));
+		button.setVisible(visible);
 
 		// add property change listener
 		PartAction action = getAction(index);
@@ -172,10 +177,13 @@ public abstract class ActionPart extends SharedPart {
 				}
 				
 				else if (prop.equals("visible")) {
+					GridData gd = (GridData)button.getLayoutData();
+					gd.exclude = !(Boolean)event.getNewValue();
+					button.setLayoutData(gd);
 					button.setVisible((Boolean)event.getNewValue());
 					button.getParent().layout(true, true);
 				}
-				
+
 				else if (prop.equals("text")) {
 					button.setText((String)event.getNewValue());
 				}
