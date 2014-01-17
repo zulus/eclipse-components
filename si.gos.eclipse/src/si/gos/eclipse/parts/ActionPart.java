@@ -105,7 +105,6 @@ public abstract class ActionPart extends SharedPart {
 	}
 	
 	public void setActionVisible(int index, boolean visible) {
-		System.out.println("Set Action visible, index: " + index + ", visible: " + visible);
 		if (actions != null && index >= 0 && actions.length > index) {
 			actions[index].setVisible(visible);
 		}
