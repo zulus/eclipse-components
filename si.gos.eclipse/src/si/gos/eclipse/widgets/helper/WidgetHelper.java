@@ -91,8 +91,7 @@ public class WidgetHelper {
 	 * Trims a composite
 	 * 
 	 * @param composite
-	 * @param topbottom
-	 * @param rightleft
+	 * @param all
 	 */
 	public static void trimComposite(Composite composite, int all) {
 		Layout raw = composite.getLayout();
