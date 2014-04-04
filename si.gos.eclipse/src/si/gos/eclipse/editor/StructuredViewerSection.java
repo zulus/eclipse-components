@@ -20,8 +20,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import si.gos.eclipse.actions.PartAction;
 import si.gos.eclipse.forms.FormLayoutFactory;
+import si.gos.eclipse.parts.StructuredViewerConfig;
 import si.gos.eclipse.parts.StructuredViewerPart;
-import si.gos.eclipse.widgets.helper.ToolkitFactory;
+import si.gos.eclipse.widgets.utils.ToolkitFactory;
 
 
 public abstract class StructuredViewerSection extends SharedSection {
@@ -45,33 +46,28 @@ public abstract class StructuredViewerSection extends SharedSection {
 		public boolean createContextMenu();
 	}
 
-	
-	public StructuredViewerSection(SharedFormPage formPage, Composite parent, int style, String[] actionLabels) {
-		this(formPage, parent, style, true, actionLabels, new int[]{});
+	public StructuredViewerSection(SharedFormPage formPage, Composite parent, int style, StructuredViewerConfig config) {
+		this(formPage, parent, style, true, config);
 	}
 	
-	public StructuredViewerSection(SharedFormPage formPage, Composite parent, int style, String[] actionLabels, int[] sensitiveActions) {
-		this(formPage, parent, style, true, actionLabels, sensitiveActions);
-	}
-	
-	public StructuredViewerSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, String[] actionLabels, int[] sensitiveActions) {
+	public StructuredViewerSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, StructuredViewerConfig config) {
 		super(formPage, parent, style, titleBar);
 		
-		viewerPart = createViewerPart(actionLabels, sensitiveActions);
+		viewerPart = createViewerPart(config);
 		viewerPart.setMinimumSize(50, 50);
 		
 		FormToolkit toolkit = formPage.getManagedForm().getToolkit();
 		createClient(getSection(), toolkit);
 	}
 
-	protected abstract StructuredViewerPart createViewerPart(String[] actionLabels, int[] sensitiveActions);
+	protected abstract StructuredViewerPart createViewerPart(StructuredViewerConfig config);
 	
 	public StructuredViewerPart getStructuredViewerPart() {
 		return viewerPart;
 	}
 	
-	protected void createViewerPartControl(Composite parent, int style, int span, FormToolkit toolkit) {
-		viewerPart.createControl(parent, style, span, new ToolkitFactory(toolkit));
+	protected void createViewerPartControl(Composite parent, FormToolkit toolkit) {
+		viewerPart.createControl(parent, new ToolkitFactory(toolkit));
 	}
 	
 	protected Composite createClientContainer(Composite parent, int span, FormToolkit toolkit) {

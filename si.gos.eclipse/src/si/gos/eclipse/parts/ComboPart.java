@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
 
 public class ComboPart {
 

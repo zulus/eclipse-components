@@ -35,8 +35,8 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
-import si.gos.eclipse.widgets.helper.ToolkitFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.ToolkitFactory;
 
 /**
  * The helper class for creating entry fields with label and text. Optionally,

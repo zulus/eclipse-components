@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
 
 public abstract class SharedPart {
 	
@@ -79,7 +79,7 @@ public abstract class SharedPart {
 		this.grayOnDisabled = grayOnDisabled;
 	}
 
-	public abstract void createControl(Composite parent, int style, int span, IWidgetFactory factory);
+	public abstract Composite createControl(Composite parent, IWidgetFactory factory);
 	
 	protected abstract Shell getShell();
 

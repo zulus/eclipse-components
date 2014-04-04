@@ -1,4 +1,4 @@
-package si.gos.eclipse.widgets.helper;
+package si.gos.eclipse.widgets.utils;
 
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;

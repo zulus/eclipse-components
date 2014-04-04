@@ -19,20 +19,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import si.gos.eclipse.actions.PartAction;
+import si.gos.eclipse.parts.StructuredViewerConfig;
 import si.gos.eclipse.parts.StructuredViewerPart;
 import si.gos.eclipse.parts.TreePart;
-import si.gos.eclipse.widgets.helper.ToolkitFactory;
+import si.gos.eclipse.widgets.utils.ToolkitFactory;
 
 
 public abstract class TreeSection extends StructuredViewerSection {
 
 	class PartAdapter extends TreePart implements IStructuredViewerAdapter {
-		public PartAdapter(String[] actionLabels) {
-			super(actionLabels);
-		}
-		
-		public PartAdapter(String[] actionLabels, int[] sensitiveActions) {
-			super(actionLabels, sensitiveActions);
+		public PartAdapter(StructuredViewerConfig config) {
+			super(config);
 		}
 
 		public void selectionChanged(IStructuredSelection selection) {
@@ -73,16 +70,16 @@ public abstract class TreeSection extends StructuredViewerSection {
 
 	}
 
-	public TreeSection(SharedFormPage formPage, Composite parent, int style, String[] buttonLabels) {
-		this(formPage, parent, style, true, buttonLabels);
+	public TreeSection(SharedFormPage formPage, Composite parent, int style, StructuredViewerConfig config) {
+		this(formPage, parent, style, true, config);
 	}
 
-	public TreeSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, String[] buttonLabels) {
-		super(formPage, parent, style, titleBar, buttonLabels, new int[]{});
+	public TreeSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, StructuredViewerConfig config) {
+		super(formPage, parent, style, titleBar, config);
 	}
 
-	protected StructuredViewerPart createViewerPart(String[] buttonLabels, int[] senstiveButtons) {
-		return new PartAdapter(buttonLabels, senstiveButtons);
+	protected StructuredViewerPart createViewerPart(StructuredViewerConfig config) {
+		return new PartAdapter(config);
 	}
 
 	protected TreePart getTreePart() {

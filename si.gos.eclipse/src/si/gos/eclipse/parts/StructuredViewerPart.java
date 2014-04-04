@@ -37,8 +37,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.forms.IFormColors;
 
 import si.gos.eclipse.actions.PartAction;
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
-import si.gos.eclipse.widgets.helper.ToolkitFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.ToolkitFactory;
 
 public abstract class StructuredViewerPart extends ActionPart {
 
@@ -56,7 +56,7 @@ public abstract class StructuredViewerPart extends ActionPart {
 	private MenuManager contextMenuManager;
 	
 	private List<ISelectionChangedListener> selectionChangedListener = new ArrayList<ISelectionChangedListener>();
-
+	
 	public StructuredViewerPart(String[] actionLabels) {
 		super(actionLabels);
 	}
@@ -65,12 +65,20 @@ public abstract class StructuredViewerPart extends ActionPart {
 	 * Creates are StructuredViewerPart with sensitive buttons. Sensitive actions will 
 	 * be enabled once a selection is made in the viewer. 
 	 * 
-	 * @param actionLabels
+	 * @param actionLabels action labels
 	 * @param sensitiveActions indices of sensitive actions
 	 */
 	public StructuredViewerPart(String[] actionLabels, int[] sensitiveActions) {
 		super(actionLabels);
-
+		initSensitiveActions(sensitiveActions);
+	}
+	
+	public StructuredViewerPart(StructuredViewerConfig config) {
+		super(config);
+		initSensitiveActions(config.getSensitiveActions());
+	}
+	
+	private void initSensitiveActions(int[] sensitiveActions) {
 		for (int i = 0; i < sensitiveActions.length; i++) {
 			this.sensitiveActions.add(sensitiveActions[i]);
 		}
@@ -94,8 +102,8 @@ public abstract class StructuredViewerPart extends ActionPart {
 		selectionChangedListener.remove(listener);
 	}
 
-	protected void createMainControl(Composite parent, int style, int span, IWidgetFactory factory) {
-		viewer = createStructuredViewer(parent, style, factory);
+	protected void createMainControl(Composite parent, IWidgetFactory factory) {
+		viewer = createStructuredViewer(parent, factory);
 		
 		// add listeners
 		viewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -119,9 +127,7 @@ public abstract class StructuredViewerPart extends ActionPart {
 		
 		// layout
 		Control control = viewer.getControl();
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = span;
-		control.setLayoutData(gd);
+		control.setLayoutData(new GridData(GridData.FILL_BOTH));
 		applyMinimumSize();
 		
 		// context menu
@@ -139,8 +145,8 @@ public abstract class StructuredViewerPart extends ActionPart {
 			registerContextMenu(contextMenuManager);
 		}
 	}
-	
-	protected abstract StructuredViewer createStructuredViewer(Composite parent, int style, IWidgetFactory factory);
+
+	protected abstract StructuredViewer createStructuredViewer(Composite parent, IWidgetFactory factory);
 
 	@Override
 	protected void createButtons(Composite parent, IWidgetFactory factory) {

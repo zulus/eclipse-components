@@ -2,7 +2,7 @@ package si.gos.eclipse.forms;
 
 import org.eclipse.swt.widgets.Composite;
 
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
 
 public class FormFactory {
 

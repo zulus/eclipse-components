@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
 
 public class WeblinkFormEntry extends FormEntry {
 

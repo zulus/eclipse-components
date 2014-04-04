@@ -26,10 +26,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import si.gos.eclipse.actions.PartAction;
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.WidgetHelper;
 
 /**
  * The ActionPart has content on the left and buttons on the right side. The buttons
@@ -39,6 +41,9 @@ import si.gos.eclipse.widgets.helper.IWidgetFactory;
 public abstract class ActionPart extends SharedPart {
 	
 	public final static String ACTION_KEY = "action";
+	
+	protected String labelText = null;
+	protected Label label;
 	
 	private PartAction[] actions;
 	private boolean[] enabledStates;
@@ -64,6 +69,11 @@ public abstract class ActionPart extends SharedPart {
 		}
 	}
 
+	public ActionPart(ActionConfig config) {
+		createActions(config.getActionLabels());
+		labelText = config.getLabel();
+	}
+	
 	public ActionPart(String[] actionLabels) {
 		createActions(actionLabels);
 	}
@@ -109,21 +119,34 @@ public abstract class ActionPart extends SharedPart {
 			actions[index].setVisible(visible);
 		}
 	}
-
-	protected abstract void createMainControl(Composite parent, int style, int span, IWidgetFactory factory);
-
-	protected abstract void handleAction(PartAction action, int index);
-
-	public void createControl(Composite parent, int style, int span, IWidgetFactory factory) {
-		shell = parent.getShell();
-		createMainLabel(parent, span, factory);
-		createMainControl(parent, style, span - 1, factory);
-		createButtons(parent, factory);
-	}
 	
 	protected Shell getShell() {
 		return shell;
 	}
+
+	protected abstract void handleAction(PartAction action, int index);
+
+	public Composite createControl(Composite parent, IWidgetFactory factory) {
+		shell = parent.getShell();
+		Composite container = createContainer(parent, factory);
+		createMainLabel(container, factory);
+		createMainControl(container, factory);
+		createButtons(container, factory);
+		
+		return container;
+	}
+	
+	public Composite createContainer(Composite parent, IWidgetFactory factory) {
+		Composite container = factory.createComposite(parent, SWT.NO_SCROLL);
+		container.setLayout(new GridLayout(2, false));
+		WidgetHelper.fillBoth(container);
+		WidgetHelper.setMargin(container, 0, 0);
+		WidgetHelper.setSpacing(container, 0, 0);
+
+		return container;
+	}
+	
+	protected abstract void createMainControl(Composite parent, IWidgetFactory factory);
 
 	protected void createButtons(Composite parent, IWidgetFactory factory) {
 		if (actions != null && actions.length > 0) {
@@ -226,7 +249,13 @@ public abstract class ActionPart extends SharedPart {
 		super.updateGrayedState();
 	}
 
-	protected void createMainLabel(Composite parent, int span, IWidgetFactory factory) {
+	protected void createMainLabel(Composite parent, IWidgetFactory factory) {
+		if (labelText != null) {
+			label = factory.createLabel(parent, labelText);
+			GridData gd = new GridData();
+			gd.horizontalSpan = 2;
+			label.setLayoutData(gd);
+		}
 	}
 
 	public Button getButton(int index) {

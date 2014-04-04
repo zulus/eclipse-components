@@ -19,19 +19,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import si.gos.eclipse.actions.PartAction;
+import si.gos.eclipse.parts.CrudConfig;
+import si.gos.eclipse.parts.StructuredViewerConfig;
 import si.gos.eclipse.parts.StructuredViewerPart;
 import si.gos.eclipse.parts.TablePart;
-import si.gos.eclipse.widgets.helper.ToolkitFactory;
+import si.gos.eclipse.widgets.utils.ToolkitFactory;
 
 public abstract class TableSection extends StructuredViewerSection {
 
 	class PartAdapter extends TablePart implements IStructuredViewerAdapter {
-		public PartAdapter(String[] actionLabels) {
-			super(actionLabels);
-		}
-		
-		public PartAdapter(String[] actionLabels, int[] sensitiveActions) {
-			super(actionLabels, sensitiveActions);
+		public PartAdapter(StructuredViewerConfig config) {
+			super(config);
 		}
 
 		public void selectionChanged(IStructuredSelection selection) {
@@ -74,16 +72,16 @@ public abstract class TableSection extends StructuredViewerSection {
 
 	}
 	
-	public TableSection(SharedFormPage formPage, Composite parent, int style, String[] actionLabels) {
-		this(formPage, parent, style, true, actionLabels);
+	public TableSection(SharedFormPage formPage, Composite parent, int style, CrudConfig config) {
+		this(formPage, parent, style, true, config);
 	}
 
-	public TableSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, String[] buttonLabels) {
-		super(formPage, parent, style, titleBar, buttonLabels, new int[]{});
+	public TableSection(SharedFormPage formPage, Composite parent, int style, boolean titleBar, CrudConfig config) {
+		super(formPage, parent, style, titleBar, config);
 	}
 
-	protected StructuredViewerPart createViewerPart(String[] actionLabels, int[] senstiveActions) {
-		return new PartAdapter(actionLabels, senstiveActions);
+	protected StructuredViewerPart createViewerPart(StructuredViewerConfig config) {
+		return new PartAdapter(config);
 	}
 
 	protected TablePart getTablePart() {

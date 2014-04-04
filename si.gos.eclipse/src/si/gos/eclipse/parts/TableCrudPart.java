@@ -4,22 +4,22 @@ import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
 
-public class TableCRUDPart extends CRUDPart {
+public class TableCrudPart extends CrudPart {
 
-	public TableCRUDPart() {
+	public TableCrudPart() {
 		super();
 	}
 	
-	public TableCRUDPart(boolean add, boolean edit, boolean remove) {
-		super(add, edit, remove);
+	public TableCrudPart(CrudConfig config) {
+		super(config);
 	}
-	
+
 	/*
 	 * @see StructuredViewerPart#createStructuredViewer(Composite, IWidgetFactory)
 	 */
-	protected StructuredViewer createStructuredViewer(Composite parent, int style, IWidgetFactory factory) {
+	protected StructuredViewer createStructuredViewer(Composite parent, IWidgetFactory factory) {
 		return factory.createTableViewer(parent, true);
 	}
 

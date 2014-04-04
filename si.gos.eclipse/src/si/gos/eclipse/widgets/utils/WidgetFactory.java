@@ -1,4 +1,4 @@
-package si.gos.eclipse.widgets.helper;
+package si.gos.eclipse.widgets.utils;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;

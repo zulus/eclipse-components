@@ -17,8 +17,8 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 import si.gos.eclipse.parts.ComboPart;
-import si.gos.eclipse.widgets.helper.IWidgetFactory;
-import si.gos.eclipse.widgets.helper.ToolkitFactory;
+import si.gos.eclipse.widgets.utils.IWidgetFactory;
+import si.gos.eclipse.widgets.utils.ToolkitFactory;
 
 public class ComboFormEntry {
 

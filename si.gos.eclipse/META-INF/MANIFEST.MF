@@ -1,18 +1,22 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Eclipse Utils
-Bundle-SymbolicName: si.gos.eclipse
+Bundle-SymbolicName: si.gos.eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: gossi
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.ui.forms,
- org.apache.commons.lang
+ org.apache.commons.lang,
+ org.apache.commons.exec,
+ org.eclipse.e4.core.di
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: si.gos.eclipse.dialogs,
+Export-Package: si.gos.eclipse.actions,
+ si.gos.eclipse.dialogs,
  si.gos.eclipse.editor,
+ si.gos.eclipse.exec,
  si.gos.eclipse.forms,
  si.gos.eclipse.parts,
- si.gos.eclipse.widgets.helper
+ si.gos.eclipse.widgets.utils
 Import-Package: org.eclipse.ui.forms.widgets

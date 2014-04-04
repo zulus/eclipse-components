@@ -1,34 +1,31 @@
 package si.gos.eclipse.parts;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import si.gos.eclipse.actions.PartAction;
 
-public abstract class CRUDPart extends StructuredViewerPart {
+public abstract class CrudPart extends StructuredViewerPart {
 
 	private int addIndex = 0;
 	private int editIndex = 1;
 	private int removeIndex = 2;
 
-	public CRUDPart() {
-		super(new String[] {"Add", "Edit", "Remove"}, new int[] {1, 2});
+	public CrudPart() {
+		this(new CrudConfig());
 	}
 	
-	public CRUDPart(String[] actionLabels, int[] sensitiveActions, int addIndex, int editIndex, int removeIndex) {
-		super(actionLabels, ArrayUtils.addAll(sensitiveActions, new int[]{addIndex, editIndex, removeIndex}));
+	public CrudPart(CrudConfig config) {
+		super(config);
 		
-		this.addIndex = addIndex;
-		this.editIndex = editIndex;
-		this.removeIndex = removeIndex;
-	}
-	
-	public CRUDPart(boolean add, boolean edit, boolean remove) {
-		this();
+		// set action indices
+		addIndex = config.getAddIndex();
+		editIndex = config.getEditIndex();
+		removeIndex = config.getRemoveIndex();
 		
-		setActionVisible(addIndex, add);
-		setActionVisible(editIndex, edit);
-		setActionVisible(removeIndex, remove);
+		// set visible actions
+		setActionVisible(addIndex, config.getAddVisible());
+		setActionVisible(editIndex, config.getEditVisible());
+		setActionVisible(removeIndex, config.getRemoveVisible());
 	}
 
 	protected void handleAction(PartAction action, int index) {

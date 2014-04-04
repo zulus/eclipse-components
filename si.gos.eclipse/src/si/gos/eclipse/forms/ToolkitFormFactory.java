@@ -2,7 +2,7 @@ package si.gos.eclipse.forms;
 
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import si.gos.eclipse.widgets.helper.ToolkitFactory;
+import si.gos.eclipse.widgets.utils.ToolkitFactory;
 
 public class ToolkitFormFactory extends FormFactory {
 
