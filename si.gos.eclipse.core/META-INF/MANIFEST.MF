@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Eclipse Utils
+Bundle-Name: Eclipse Components
 Bundle-SymbolicName: si.gos.eclipse.core;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: gossi
